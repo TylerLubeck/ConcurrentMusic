@@ -9,6 +9,7 @@ class Chat(LineReceiver):
     INDEX = 0
 
     def __init__(self, users):
+        # TODO: Link connection to connected computers hostname
         self.users = users
         self.name = None
         self.state = "GETNAME"
@@ -17,12 +18,18 @@ class Chat(LineReceiver):
 
     def connectionMade(self):
         print("GOT A CONNECTION")
-        self.sendLine("You get {}".format(NOTES[INDEX]))
+        self.sendLine("You get {}".format(NOTES[Chat.INDEX]))
         Chat.INDEX += 1
+        self.state = "CHAT"
+        self.name = 'jon'
+        self.users[self.name] = self
 
     def connectionLost(self, reason):
         if self.users.has_key(self.name):
             del self.users[self.name]
+            # TODO: Link connection to letter rather than assume that
+            #       most recent connection is the one that drops off.
+            Chat.INDEX -= 1
 
     def lineReceived(self, line):
         if self.state == "GETNAME":
