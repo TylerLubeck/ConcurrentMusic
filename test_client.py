@@ -5,18 +5,18 @@ from twisted.internet import reactor
 from twisted.internet.protocol import Protocol, ClientFactory
 
 
-class Echo(Protocol):
+class Musician(Protocol):
     def dataReceived(self, data):
         stdout.write(data)
 
 
-class EchoClientFactory(ClientFactory):
+class MusicianClientFactory(ClientFactory):
     def startedConnecting(self, connector):
         print 'Started to connect.'
 
     def buildProtocol(self, addr):
         print 'Connected.'
-        return Echo()
+        return Musician()
 
     def clientConnectionLost(self, connector, reason):
         print 'Lost connection.  Reason:', reason
@@ -34,5 +34,5 @@ def parseArgs():
 
 if __name__ == '__main__':
     args = parseArgs()
-    reactor.connectTCP(args.ip, args.port, EchoClientFactory())
+    reactor.connectTCP(args.ip, args.port, MusicianClientFactory())
     reactor.run()
