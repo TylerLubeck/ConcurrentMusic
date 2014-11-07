@@ -1,9 +1,12 @@
 from twisted.internet.protocol import Factory
 from twisted.protocols.basic import LineReceiver
 from twisted.internet import reactor
+import argparse
+
 
 NOTES = ['A', 'B', 'C', 'D', 'E']
 INDEX = 0
+
 
 class Chat(LineReceiver):
     INDEX = 0
@@ -25,7 +28,7 @@ class Chat(LineReceiver):
         self.users[self.name] = self
 
     def connectionLost(self, reason):
-        if self.users.has_key(self.name):
+        if self.name in self.users:
             del self.users[self.name]
             # TODO: Link connection to letter rather than assume that
             #       most recent connection is the one that drops off.
@@ -38,13 +41,13 @@ class Chat(LineReceiver):
             self.handle_CHAT(line)
 
     def handle_GETNAME(self, name):
-        if self.users.has_key(name):
+        if name in self.users:
             self.sendLine("Name taken, please choose another.")
             return
         self.sendLine("Welcome, %s!" % (name,))
-        #for name, protocol in self.users.iteritems():
-        #    if protocol != self:
-        #        protocol.sendLine("Welcome, %s!" % (name,))
+        # for name, protocol in self.users.iteritems():
+        #     if protocol != self:
+        #         protocol.sendLine("Welcome, %s!" % (name,))
         self.name = name
         self.users[name] = self
         self.state = "CHAT"
@@ -59,11 +62,23 @@ class Chat(LineReceiver):
 class ChatFactory(Factory):
 
     def __init__(self):
-        self.users = {} # maps user names to Chat instances
+        self.users = {}  # maps user names to Chat instances
 
     def buildProtocol(self, addr):
         return Chat(self.users)
 
 
-reactor.listenTCP(8123, ChatFactory())
-reactor.run()
+def main():
+    desc = 'Launch the conductor for the distributed music client/server system'
+    parser = argparse.ArgumentParser(description=desc)
+    parser.add_argument('--port', '-p', dest='port', type=int,
+                        default=8123, help='The port to listen on')
+    args = parser.parse_args()
+
+    print("Listening on port {}...".format(args.port))
+    reactor.listenTCP(args.port, ChatFactory())
+    reactor.run()
+
+
+if __name__ == '__main__':
+    main()
