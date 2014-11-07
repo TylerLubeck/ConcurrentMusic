@@ -1,4 +1,6 @@
 import argparse
+import json
+import socket
 
 from sys import stdout
 from twisted.internet import reactor
@@ -7,7 +9,13 @@ from twisted.internet.protocol import Protocol, ClientFactory
 
 class Musician(Protocol):
     def dataReceived(self, data):
-        stdout.write(data)
+        print data
+
+    def connectionMade(self):
+        self.transport.write(json.dumps({'hostname': socket.gethostname()}))
+
+    def connectionLost(self, reason):
+        print 'Lost connection:', reason
 
 
 class MusicianClientFactory(ClientFactory):
