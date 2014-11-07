@@ -1,4 +1,5 @@
 *.*.sw[po]
+concur_env/
 .ropeproject/
 # Byte-compiled / optimized / DLL files
 __pycache__/
