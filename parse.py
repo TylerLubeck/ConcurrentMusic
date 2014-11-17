@@ -56,6 +56,12 @@ for i in range(0, len(newSong.notes)):
 	for j in range(0, len(newSong.notes[i].action)):
 		print newSong.notes[i].action[j].action + 'start' + str(newSong.notes[i].action[j].start)
 
+import os 
+def playsound(frequency, duration):
+	os.system('beep -f %s -l %s' % (frequency,duration))
+
+playsound(100, 2)
+
 
 
 
