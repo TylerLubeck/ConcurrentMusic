@@ -7,7 +7,7 @@ def get_freq(note):
 
 def get_duration(bpm, length, hold):
 	#pass in number of holds?
-	duration = 1/length
+	duration = 1/int(length)
 	if hold != 0: duration = duration * (hold + 1)
 
 	return (60 / bpm) * duration
