@@ -7,10 +7,12 @@ def get_freq(note):
 
 def get_duration(bpm, length, hold):
 	#pass in number of holds?
-	duration = 1/int(length)
-	if hold != 0: duration = duration * (hold + 1)
+	if length != 'h':
+		duration = 1.0/float(int(length))
+	else:
+		duration = hold
 
-	return (60 / bpm) * duration
+	return float((60 / bpm) * duration)
 
 #C         261.6
 #C#        277.2

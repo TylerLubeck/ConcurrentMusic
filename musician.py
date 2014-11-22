@@ -28,15 +28,27 @@ class Musician(Protocol):
 
     def play_notes(self):
         a = audio.Audio()
-        for i in range(0, len(self.note.actions)):
+        i = 0
+        while i < len(self.note.actions):
             #TODO: FIX TIME
             hold = 0
             if self.note.actions[i].action != '-':
-                while self.note.actions[i] == 'h':
-                    hold += 1
-                    i += 1
-                duration = note_to_freq.get_duration(60, self.note.actions[i].action, hold)
-                reactor.callLater(self.note.actions[i].start, a.play, self.freq, duration)
+                if self.note.actions[i].action != 'h':
+                    # playing a number of times in one beat
+                    times_played = int(self.note.actions[i].action)
+                    for j in range(times_played):
+                        duration = note_to_freq.get_duration(60, self.note.actions[i].action, hold)
+                        reactor.callLater(self.note.actions[i].start + j/times_played, a.play, self.freq, duration)     
+                else:
+                    # playing a note held over multiple beats
+                    while i < len(self.note.actions) and self.note.actions[i].action == 'h':
+                        hold += 1
+                        i += 1
+                    i -= hold
+                    duration = note_to_freq.get_duration(60, self.note.actions[i].action, hold)
+                    reactor.callLater(self.note.actions[i].start, a.play, self.freq, duration)
+                    i += hold
+            i += 1
 
 class MusicianFactory(ClientFactory):
     def startedConnecting(self, connector):

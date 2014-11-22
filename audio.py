@@ -1,11 +1,18 @@
 # Audio.py
 # defines play
+import threading
 
 
 class Audio():
 
     def __init__(self):
-        self.play = self.get_play()
+        self.play_func = self.get_play()
+        self.mutex = threading.Lock()
+
+    def play(self, freq, duration):
+        self.mutex.acquire()
+        self.play_func(freq, duration)
+        self.mutex.release()
 
     def get_play(self):
         import math
