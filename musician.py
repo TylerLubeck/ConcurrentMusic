@@ -1,5 +1,6 @@
 import argparse
 import json
+import parse
 import socket
 
 from twisted.internet import reactor
@@ -8,7 +9,14 @@ from twisted.internet.protocol import Protocol, ClientFactory
 
 class Musician(Protocol):
     def dataReceived(self, data):
-        print data
+        loaded_data = json.loads(data)
+        if 'freq' in loaded_data.keys() and 'actions' in loaded_data.keys():
+            self.note = parse.Note()
+            self.note.freq = loaded_data['freq']
+            self.note.actions = loaded_data['actions']
+            print 'GOT A LETTER: {}'.format(self.note.freq)
+        else:
+            print loaded_data
 
     def connectionMade(self):
         self.transport.write(json.dumps({'hostname': socket.gethostname()}))
