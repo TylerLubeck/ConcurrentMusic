@@ -8,7 +8,7 @@ NOTES = ['A', 'B', 'C', 'D', 'E']
 INDEX = 0
 
 
-class Chat(Protocol):
+class Conductor(Protocol):
 
     def __init__(self, users, notes=[]):
         self.users = users
@@ -42,13 +42,13 @@ class Chat(Protocol):
             self.notes.append(note)
 
 
-class ChatFactory(Factory):
+class ConductorFactory(Factory):
 
     def __init__(self):
-        self.users = {}  # maps user names to Chat instances
+        self.users = {}  # maps user names to Conductor instances
 
     def buildProtocol(self, addr):
-        return Chat(self.users, NOTES)
+        return Conductor(self.users, NOTES)
 
 
 def main():
@@ -59,7 +59,7 @@ def main():
     args = parser.parse_args()
 
     print("Listening on port {}...".format(args.port))
-    reactor.listenTCP(args.port, ChatFactory())
+    reactor.listenTCP(args.port, ConductorFactory())
     reactor.run()
 
 

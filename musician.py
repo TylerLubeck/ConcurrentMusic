@@ -14,7 +14,7 @@ class Musician(Protocol):
         self.transport.write(json.dumps({'hostname': socket.gethostname()}))
 
 
-class MusicianClientFactory(ClientFactory):
+class MusicianFactory(ClientFactory):
     def startedConnecting(self, connector):
         print 'Started to connect.'
 
@@ -38,5 +38,5 @@ def parseArgs():
 
 if __name__ == '__main__':
     args = parseArgs()
-    reactor.connectTCP(args.ip, args.port, MusicianClientFactory())
+    reactor.connectTCP(args.ip, args.port, MusicianFactory())
     reactor.run()
