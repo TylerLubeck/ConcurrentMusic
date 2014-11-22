@@ -12,7 +12,6 @@ class Conductor(Protocol):
         self.state = "GETNAME"
         self.notes = notes
         self.hostname = None
-        print json.dumps(self.notes)
 
     def connectionMade(self):
         print("GOT A CONNECTION")
@@ -28,7 +27,7 @@ class Conductor(Protocol):
             self.users[self.hostname] = {'user': self,
                                          'note': note}
             self.state = 'SENDLETTERS'
-        self.transport.write(json.dumps({'note': note}))
+        self.transport.write(json.dumps(note.toDictionary()))
         print self.state
         print self.users
         print self.notes
