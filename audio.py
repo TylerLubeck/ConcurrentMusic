@@ -14,14 +14,19 @@ class Audio():
         try:
             # use pyaudio for osx
             import pyaudio
-
-            def real_play(freq, duration):
-                p = pyaudio.PyAudio()
-                # TODO: maybe don't do every time?
-                stream = p.open(format=p.get_format_from_width(1),
+            p = pyaudio.PyAudio()
+            stream = p.open(format=p.get_format_from_width(1),
                                 channels=1,
                                 rate=bit_rate,
                                 output=True)
+
+            def real_play(freq, duration):
+                #p = pyaudio.PyAudio()
+                # TODO: maybe don't do every time?
+                #stream = p.open(format=p.get_format_from_width(1),
+                #                channels=1,
+                #                rate=bit_rate,
+                #                output=True)
                 number_of_frames = int(bit_rate * duration)
                 rest_frames = number_of_frames % bit_rate
                 wavedata = ''
@@ -32,10 +37,13 @@ class Audio():
                     wavedata += chr(128)
 
                 stream.write(wavedata)
-                stream.stop_stream()
-                stream.close()
-                p.terminate()
+                #stream.stop_stream()
+                #stream.close()
+                #p.terminate()
             return real_play
+            stream.stop_stream()
+            stream.close()
+            p.terminate()
 
         except ImportError, e1:
             try:
@@ -64,6 +72,8 @@ class Audio():
 
 if __name__ == '__main__':
     a = Audio()
+    a.play(261.63, 1.2232)
+    a.play(261.63, 1.2232)
     a.play(261.63, 1.2232)
     a.play(277.2, 1.2232)
     a.play(293.7, 1.2232)
