@@ -2,10 +2,7 @@ from twisted.internet.protocol import Factory, Protocol
 from twisted.internet import reactor
 import argparse
 import json
-
-
-NOTES = ['A', 'B', 'C', 'D', 'E']
-INDEX = 0
+import parse
 
 
 class Conductor(Protocol):
@@ -30,7 +27,7 @@ class Conductor(Protocol):
             self.users[self.hostname] = {'user': self,
                                          'note': note}
             self.state = 'SENDLETTERS'
-        self.transport.write(json.dumps({'note': note}))
+        self.transport.write(json.dumps(note.toDictionary()))
         print self.state
         print self.users
         print self.notes
@@ -44,22 +41,28 @@ class Conductor(Protocol):
 
 class ConductorFactory(Factory):
 
-    def __init__(self):
-        self.users = {}  # maps user names to Conductor instances
+    def __init__(self, notes):
+        self.users = {}     # maps user names to Conductor instances
+        self.notes = notes  # list of Note objects from parser
 
     def buildProtocol(self, addr):
-        return Conductor(self.users, NOTES)
+        return Conductor(self.users, self.notes)
 
 
 def main():
     desc = 'Launch the conductor for the distributed music client/server system'
-    parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('--port', '-p', dest='port', type=int,
-                        default=8123, help='The port to listen on')
-    args = parser.parse_args()
+    arg_parser = argparse.ArgumentParser(description=desc)
+    arg_parser.add_argument('--port', '-p', dest='port', type=int,
+                            default=8123, help='The port to listen on')
+    arg_parser.add_argument('--song', '-s', dest='song',
+                            help='The file containing the song to play')
+    args = arg_parser.parse_args()
+    
+    song_parser = parse.Parse()
+    song_parser.parse(args.song)
 
     print("Listening on port {}...".format(args.port))
-    reactor.listenTCP(args.port, ConductorFactory())
+    reactor.listenTCP(args.port, ConductorFactory(song_parser.notes))
     reactor.run()
 
 
