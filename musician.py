@@ -13,7 +13,8 @@ class Musician(Protocol):
         if 'freq' in loaded_data.keys() and 'actions' in loaded_data.keys():
             self.note = parse.Note()
             self.note.freq = loaded_data['freq']
-            self.note.actions = loaded_data['actions']
+            for a in loaded_data['actions']:
+                self.note.actions.append(parse.Action(a['action'], a['start']))
             print 'GOT A LETTER: {}'.format(self.note.freq)
         else:
             print loaded_data
