@@ -10,17 +10,17 @@ def get_freq(note):
 def get_duration(bpm, plays_in_beat):
     """Returns the duration of a quarter, eighth, etc. note in seconds."""
     duration = 1.0 / float(plays_in_beat) 
-    return SCALE_FACTOR * duration * (60.0 / bpm)
+    return SCALE_FACTOR * duration * (60.0 / float(bpm))
 
 
 def get_held_duration(bpm, beats_held):
     """Returns the duration of a half, whole, etc. note in seconds."""
-    return SCALE_FACTOR * beats_held * (60.0 / bpm)
+    return SCALE_FACTOR * beats_held * (60.0 / float(bpm))
 
 
 def get_start_time(bpm, beat_number):
     """Returns the offset from the beginning of the song to play in seconds."""
-    return beat_number * (60.0 / bpm)
+    return beat_number * (60.0 / float(bpm))
 
 #C         261.6
 #C#        277.2

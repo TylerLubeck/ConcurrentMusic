@@ -65,14 +65,16 @@ class Audio():
 
             except ImportError, e2:
                 # use system calls for lab machines
+                #def real_play(freq, duration):
+                #    sample = 8000
+                #    half_period = int(sample/freq/2)
+                #    beep = chr(amplitude)*half_period+chr(0)*half_period
+                #    beep *= int(duration*freq)
+                #    audio = file('/dev/audio', 'wb')
+                #    audio.write(beep)
+                #    audio.close()
                 def real_play(freq, duration):
-                    sample = 8000
-                    half_period = int(sample/frequency/2)
-                    beep = chr(amplitude)*half_period+chr(0)*half_period
-                    beep *= int(duration*frequency)
-                    audio = file('/dev/audio', 'wb')
-                    audio.write(beep)
-                    audio.close()
+                    print 'CANNOT PLAY ON THIS MACHINE.'
 
                 return real_play
 

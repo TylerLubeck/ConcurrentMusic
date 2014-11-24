@@ -1,26 +1,24 @@
 import argparse
 import json
-import parse
 import socket
-import audio
-import note_to_freq
 
 from twisted.internet import reactor
 from twisted.internet.protocol import Protocol, ClientFactory
+
+import audio
+import note_to_freq
+import parse
 
 
 class Musician(Protocol):
     def dataReceived(self, data):
         loaded_data = json.loads(data)
-        if 'freq' in loaded_data.keys() and 'actions' in loaded_data.keys():
-            self.note = parse.Note()
-            self.note.freq = loaded_data['freq']
-            self.freq = note_to_freq.get_freq(self.note.freq)
-            for a in loaded_data['actions']:
-                self.note.actions.append(parse.Action(a['action'], a['start']))
-            print 'GOT A LETTER: {}'.format(self.note.freq)
+        if 'note' in loaded_data.keys():
+            self.note = loaded_data['note']
+            print 'GOT A NOTE: {}'.format(self.note['frequency'])
             self.play_notes()
         else:
+            # unhandled message
             print loaded_data
 
     def connectionMade(self):
@@ -28,31 +26,9 @@ class Musician(Protocol):
 
     def play_notes(self):
         a = audio.Audio()
-        i = 0
-        while i < len(self.note.actions):
-            #TODO: FIX TIME
-            hold = 0
-            if self.note.actions[i].action == '-':
-                # play nothing
-                i += 1
-            elif self.note.actions[i].action == 'h':
-                # playing a note held over multiple beats
-                while i < len(self.note.actions) and self.note.actions[i].action == 'h':
-                    hold += 1
-                    i += 1
-                i -= hold
-                duration = note_to_freq.get_duration(60, self.note.actions[i].action, hold)
-                print "calling callLater h"
-                reactor.callLater(self.note.actions[i].start, a.play, self.freq, duration)
-                i += hold
-            else:
-                # playing a number of times in one beat
-                times_played = int(self.note.actions[i].action)
-                for j in range(times_played):
-                    duration = note_to_freq.get_duration(60, self.note.actions[i].action, hold)
-                    print "calling callLater not h"
-                    reactor.callLater(self.note.actions[i].start + j/times_played, a.play, self.freq, duration)     
-                i += 1                
+        for action in self.note['actions']:
+            reactor.callLater(action['start_time'], a.play,
+                              self.note['frequency'], action['duration'])     
             
 
 class MusicianFactory(ClientFactory):
