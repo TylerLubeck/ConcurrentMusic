@@ -1,19 +1,26 @@
-
 FREQUENCIES = {'A': 440.0, 'B': 493.9, 'C': 261.6, 'D': 293.7, 
                'E': 329.6, 'F': 349.2, 'G': 392.0};
+SCALE_FACTOR = 0.9
 
 def get_freq(note):
-	return FREQUENCIES[note]
+    """Returns the frequency in Hz of the given letter note."""
+    return FREQUENCIES[note]
 
-def get_duration(bpm, length, hold):
-	#pass in number of holds?
-	if length != 'h':
-		duration = 1.0/float(int(length)) 
-		duration -= .2
-	else:
-		duration = hold
 
-	return float((60 / bpm) * duration)
+def get_duration(bpm, plays_in_beat):
+    """Returns the duration of a quarter, eighth, etc. note in seconds."""
+    duration = 1.0 / float(plays_in_beat) 
+    return SCALE_FACTOR * duration * (60.0 / bpm)
+
+
+def get_held_duration(bpm, beats_held):
+    """Returns the duration of a half, whole, etc. note in seconds."""
+    return SCALE_FACTOR * beats_held * (60.0 / bpm)
+
+
+def get_start_time(bpm, beat_number):
+    """Returns the offset from the beginning of the song to play in seconds."""
+    return beat_number * (60.0 / bpm)
 
 #C         261.6
 #C#        277.2
