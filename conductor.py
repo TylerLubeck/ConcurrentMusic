@@ -1,19 +1,17 @@
-from twisted.internet.protocol import Factory, Protocol
-from twisted.internet import reactor
 import argparse
 import json
 
+from twisted.internet.protocol import Factory, Protocol
+from twisted.internet import reactor
 
-NOTES = ['A', 'B', 'C', 'D', 'E']
-INDEX = 0
+import parse
 
 
-class Chat(Protocol):
-
-    def __init__(self, users, notes=[]):
+class Conductor(Protocol):
+    def __init__(self, users, song):
         self.users = users
         self.state = "GETNAME"
-        self.notes = notes
+        self.song = song
         self.hostname = None
 
     def connectionMade(self):
@@ -26,40 +24,45 @@ class Chat(Protocol):
                 self.transport.write(json.dumps({'error': 'Name in use'}))
                 return
             self.hostname = hostname
-            note = self.notes.pop(0)
+            note = self.song['song_notes'].pop(0)
             self.users[self.hostname] = {'user': self,
                                          'note': note}
             self.state = 'SENDLETTERS'
         self.transport.write(json.dumps({'note': note}))
         print self.state
         print self.users
-        print self.notes
+        print self.song['song_notes']
 
     def connectionLost(self, reason):
         if self.hostname is not None and self.hostname in self.users:
             note = self.users[self.hostname]['note']
             del self.users[self.hostname]
-            self.notes.append(note)
+            self.song['song_notes'].append(note)
 
 
-class ChatFactory(Factory):
+class ConductorFactory(Factory):
 
-    def __init__(self):
-        self.users = {}  # maps user names to Chat instances
+    def __init__(self, song):
+        self.users = {}     # maps user names to Musician instances
+        self.song = song    # object returned by parser
 
     def buildProtocol(self, addr):
-        return Chat(self.users, NOTES)
+        return Conductor(self.users, self.song)
 
 
 def main():
     desc = 'Launch the conductor for the distributed music client/server system'
-    parser = argparse.ArgumentParser(description=desc)
-    parser.add_argument('--port', '-p', dest='port', type=int,
-                        default=8123, help='The port to listen on')
-    args = parser.parse_args()
+    arg_parser = argparse.ArgumentParser(description=desc)
+    arg_parser.add_argument('--port', '-p', dest='port', type=int,
+                            default=8123, help='The port to listen on')
+    arg_parser.add_argument('--song', '-s', dest='song',
+                            help='The file containing the song to play')
+    args = arg_parser.parse_args()
+    
+    parsed_song = parse.parse(args.song)
 
     print("Listening on port {}...".format(args.port))
-    reactor.listenTCP(args.port, ChatFactory())
+    reactor.listenTCP(args.port, ConductorFactory(parsed_song))
     reactor.run()
 
 
