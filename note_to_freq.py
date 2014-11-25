@@ -1,10 +1,32 @@
-FREQUENCIES = {'A': 440.0, 'B': 493.9, 'C': 261.6, 'D': 293.7, 
-               'E': 329.6, 'F': 349.2, 'G': 392.0};
+# Based on C = middle C
+# Obtained from http://www.phy.mtu.edu/~suits/notefreqs.html
+FREQUENCIES = {'C': 261.63,
+               'C#': 277.18, 'Db': 277.18,
+               'E': 329.63,
+               'F': 349.23,
+               'F#': 369.99, 'Gb': 369.99,
+               'G': 392.00,
+               'G#': 415.30, 'Ab': 415.30,
+               'A': 440.00,
+               'A#': 466.16, 'Bb': 466.16,
+               'B': 493.88}
+
 SCALE_FACTOR = 0.9
 
+class NoSuchNoteError(Exception):
+    """Error for signaling that the "note" is not valid."""
+    pass
+
+
 def get_freq(note):
-    """Returns the frequency in Hz of the given letter note."""
-    return FREQUENCIES[note]
+    """Returns the frequency in Hz of the given letter note.
+    
+    Raises NoSuchNoteError if the given note is badly formed.
+    """
+    try:
+        return FREQUENCIES[note]
+    except KeyError:
+        raise NoSuchNoteError('Note does not exist: %s' % note)
 
 
 def get_duration(bpm, plays_in_beat):
@@ -22,16 +44,3 @@ def get_start_time(bpm, beat_number):
     """Returns the offset from the beginning of the song to play in seconds."""
     return beat_number * (60.0 / float(bpm))
 
-#C         261.6
-#C#        277.2
-#D         293.7
-#D#        311.1
-#E         329.6
-#F         349.2
-#F#        370.0
-#G         392.0
-#G#        415.3
-#A         440.0
-#A#        466.2
-#B         493.9
-#C         523.2

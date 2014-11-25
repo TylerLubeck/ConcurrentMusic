@@ -44,7 +44,11 @@ def parse_line(line, bpm, note_list, mutex):
     if len(line_parts) != 2:
         return
     # part of line before colon has letter; need to get frequency
-    note['frequency'] = note_to_freq.get_freq(line_parts[0])
+    try:
+        note['frequency'] = note_to_freq.get_freq(line_parts[0])
+    except note_to_freq.NoSuchNoteError:
+        sys.stderr.write('Invalid note: %s\n' % line_parts[0])
+        return
     line = line_parts[1].strip()
     i = 0
     # build list of actions for note
