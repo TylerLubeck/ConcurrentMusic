@@ -40,49 +40,40 @@ def parse_line(line, bpm, note_list, mutex):
     """Parse a particular note in the song. Meant to be used concurrently."""
     note = {'frequency': 0,
             'actions': []}
+    line_parts = line.split(':')
+    if len(line_parts) != 2:
+        return
+    # part of line before colon has letter; need to get frequency
+    note['frequency'] = note_to_freq.get_freq(line_parts[0])
+    line = line_parts[1].strip()
     i = 0
-    beat = 0
-    start = False
+    # build list of actions for note
     while i < len(line):
         holds = 0
-        if (line[i] != ' ' and start == False):
-            # found new note ('A', 'B', etc.)
-            note['frequency'] = note_to_freq.get_freq(line[i])
-            start = True
+        action = line[i]
+        if action == '-':
+            # not playing, do nothing
             i += 1
-        elif line[i] == ':':
-            beat = 0
-            i += 1
-        elif (line[i] != ' ' and line[i] != '\n' and start):
-            # know we have started the song
-            beat += 1
-            action = line[i]
-            if action == '-':
-                # not playing, do nothing
+        elif action == 'h':
+            # playing note held over multiple beats
+            while i < len(line) and line[i] == 'h':
+                holds += 1
                 i += 1
-            elif action == 'h':
-                # playing note held over multiple beats
-                while i < len(line) and line[i] == 'h':
-                    holds += 1
-                    i += 1
-                i -= holds
-                duration = note_to_freq.get_held_duration(bpm, holds)
-                start_time = note_to_freq.get_start_time(bpm, beat)
+            i -= holds
+            duration = note_to_freq.get_held_duration(bpm, holds)
+            start_time = note_to_freq.get_start_time(bpm, i)
+            note['actions'].append({'duration': duration,
+                                    'start_time': start_time})
+            i += holds
+        else:
+            # playing some number of times in one beat
+            times_played = int(action)
+            duration = note_to_freq.get_duration(bpm, times_played)
+            beat_start_time = note_to_freq.get_start_time(bpm, i)
+            for j in range(times_played):
+                start_time = beat_start_time + j / float(times_played)
                 note['actions'].append({'duration': duration,
                                         'start_time': start_time})
-                i += holds
-            else:
-                # playing some number of times in one beat
-                times_played = int(action)
-                duration = note_to_freq.get_duration(bpm, times_played)
-                beat_start_time = note_to_freq.get_start_time(bpm, beat)
-                for j in range(times_played):
-                    start_time = beat_start_time + j / float(times_played)
-                    note['actions'].append({'duration': duration,
-                                            'start_time': start_time})
-                i += 1
-        else:
-            start = False
             i += 1
     mutex.acquire()
     note_list.append(note)
