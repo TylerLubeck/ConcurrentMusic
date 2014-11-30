@@ -1,80 +1,126 @@
-\documentclass[10pt,letterpaper]{article}
+\documentclass[12pt, letterpaper]{article}
+
+\usepackage{courier}
 \usepackage[margin=1in]{geometry}
+\usepackage[colorlinks, linkcolor=black, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
+\usepackage{parskip}
 
 \begin{document}
 
-    % Title
-    \title{Digitally Distributed Orchestra: DDO}
-    \author{Andrea Compton, Ashley Hedberg, and Tyler Lubeck}
-    \date{December 5, 2014}
-    \maketitle
+% Title
+\title{Digitally Distributed Orchestra: DDO}
+\author{Andrea Compton, Ashley Hedberg, and Tyler Lubeck}
+\date{December 5, 2014}
+\maketitle
 
-    % Makes the table of contents less deep
-    \setcounter{tocdepth}{2}
-    \tableofcontents
+% Makes the table of contents less deep
+\setcounter{tocdepth}{2}
+\tableofcontents
 
-    % Project Summary
-    \section{Project Goals}
+% Project Summary
+\section{Project Goals}
+Our goal for this project was to create a digitally distributed orchestra. Given a representation of a song (i.e. digitized sheet music), one computer would assign various client machines a note to play. The client machines would then play the song together.
 
+At a minimum, we wanted our orchestra to be able to play a hard-coded sequence of frequencies and durations in unison. Our stretch goals included being able to play any song written in a specific format. This would involve handling songs which played notes in multiple octaves as well as those containing sharps and/or flats.
 
-    % Design Decisions
-    \section{Final Design}
+% Design Decisions
+\section{Final Design}
 
-        \subsection{Client-Server Relationship}
-            \subsubsection{Option 1: Twisted}
-            \subsubsection{Option 2: Tornado}
-            \subsubsection{Option 3: Erlang}
-            \subsubsection{Decision}
+\subsection{Client-Server Relationship}
+For this project, we need to implement some notion of clients communicating with a central server. We considered two options for this.
+            
+\subsubsection{Option 1: Twisted}
+The first was using the \href{https://twistedmatrix.com/}{Twisted} Python package. Given that parsing of the song file and playing the audio must be done in Python, using this option would allow the entire project to be implemented in one language. Twisted has a built-in notion of connections being made and lost, which would allow our server to more easily keep track of clients and distribute song notes accordingly. It also has a notion of executing tasks at specific time deltas, which may help enforce a consistent concept of time among the clients. However, none of us have used this framework before, and it involves some fairly low-level asynchronous calls, which may prove to be a challenge.
+            
+\subsubsection{Option 2: Erlang}
+The second was implementing the server/client relationship in Erlang and the file/audio parsing in Python. This option would allow us to take advantage of Erlang’s built-in message passing for note distribution. File parsing and sound generation would be more easily accomplished in Python, and we could use the \href{http://erlport.org/docs/python.html}{ErlPort} package to communicate between the two languages. However, we would have to implement the concept of client connections being lost ourselves.
+            
+\subsubsection{Decision}
+We opted to use the first method. Being able to redistribute notes when a client drops seems like an important requirement for a digitally distributed orchestra. This functionality is built in to the Twisted servers, whereas we would have to implement it ourselves in the Erlang clients.
 
-        \subsection{Sheet Music Representation}
-            \subsubsection{Inspiration from Guitar Tabs}
-            \subsubsection{Refinement of Long Note Representation}
-            \subsubsection{Handling of Sharps and Flats}
-            \subsubsection{Handling of Octaves}
-
-        \subsection{Audio Generation}
-            \subsubsection{PyAudio}
-            \subsubsection{winsound}
-            \subsubsection{Linux System Calls}
-
-        \subsection{Design Diagram}
-
-        \subsection{Reflection}
-            \subsubsection{Best Decision}
-            \subsubsection{Room for Improvement}
-
-
-    % Analysis of Outcome
-    \section{Analysis of Outcome}
-
-
-    % Abstractions and Language
-    \section{Abstractions and Language}
-
-        \subsection{Musicians}
+\subsection{Sheet Music Representation}
         
-        \subsection{Conductors}
+\subsubsection{Inspiration from Guitar Tabs}
+Our initial text-based representation of a song was the following:
+            
+\begin{verbatim}
+Song Title
+Beats per minute (an integer)
+Note 1: ---X---X---
+Note 2: --XX---X---
+...
+\end{verbatim}
+            
+Note 1, 2, etc. will be “A”, “B”, and so on. A dash represents a beat where the given note does not play, and an X represents a beat where the given note does play.
+            
+\subsubsection{Refinement of Long Note Representation}
+After we began implementing the parser for this format, we realized that this was not the best representation. We modified our song format to include the dash character (\texttt{-}), numbers, and the letter \texttt{h}. A dash represents one beat of silence. Numbers represent the number of times the note plays in one beat. This allows us to represent quarter notes, eighth notes, and so on. The \texttt{h} indicates a hold of the previous note, and allows us to represent notes lasting longer than one beat. "Hot Cross Buns," for example, looked like this in the new format:
+            
+\begin{verbatim}
+hot cross buns
+60
+B:1--1----1---
+A:-1----22-1--
+G:--1h22----1h
+\end{verbatim}
 
-        \subsection{Parsed Songs}
+We then discovered that handling held notes with this format was cumbersome. If a 1 was found while parsing, it was difficult to discern whether the note played for one beat or was supposed to be held over multiple beats. As a result, we again modified our format so that all beats over which a note was supposed to be held were designated by the \texttt{h} character. This led us to the following representation of "Hot Cross Buns":
+
+\begin{verbatim}
+hot cross buns
+60
+B:1--1----1---
+A:-1----22-1--
+G:--hh22----hh
+\end{verbatim}
+            
+\subsubsection{Handling of Sharps and Flats}
+\subsubsection{Handling of Octaves}
+
+\subsection{Audio Generation}
+
+\subsubsection{PyAudio}
+\subsubsection{winsound}
+\subsubsection{Linux System Calls}
+
+\subsection{Design Diagram}
+
+\subsection{Reflection}
+\subsubsection{Best Decision}
+\subsubsection{Room for Improvement}
 
 
-    % Implementation Timeline
-    \section{Implementation Strategy}
-
-        \subsection{Timeline}
-
-        \subsection{Reflection on Division of Labor}
+% Analysis of Outcome
+\section{Analysis of Outcome}
 
 
-    % Bug Report
-    \section{Bug Report}
+% Abstractions and Language
+\section{Abstractions and Language}
+
+\subsection{Musicians}
+        
+\subsection{Conductors}
+
+\subsection{Parsed Songs}
 
 
-    % Code Overview
-    \section{Code Overview}
+% Implementation Timeline
+\section{Implementation Strategy}
+
+\subsection{Timeline}
+
+\subsection{Reflection on Division of Labor}
 
 
-    % How To Run
-    \section{How To Run}
+% Bug Report
+\section{Bug Report}
+
+
+% Code Overview
+\section{Code Overview}
+
+
+% How To Run
+\section{How To Run}
 
 \end{document}
