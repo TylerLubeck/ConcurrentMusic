@@ -21,7 +21,9 @@
 \section{Project Goals}
 Our goal for this project was to create a digitally distributed orchestra. Given a representation of a song (i.e. digitized sheet music), one computer would assign various client machines a note to play. The client machines would then play the song together.
 
-At a minimum, we wanted our orchestra to be able to play a hard-coded sequence of frequencies and durations in unison. Our stretch goals included being able to play any song written in a specific format. This would involve handling songs which played notes in multiple octaves as well as those containing sharps and/or flats.
+At a minimum, we wanted our orchestra to be able to play a hard-coded sequence of frequencies and durations in unison. Any client with \href{http://people.csail.mit.edu/hubert/pyaudio/}{PyAudio} installed could serve as a client in our minimum deliverable.
+
+One stretch goal was being able to play any song written in a specific format. This would involve handling songs which played notes in multiple octaves as well as those containing sharps and/or flats. Another stretch goal was supporting more types of client machines, such as Windows and Linux machines without the PyAudio package. 
 
 % Design Decisions
 \section{Final Design}
@@ -75,33 +77,59 @@ G:--hh22----hh
 \end{verbatim}
             
 \subsubsection{Handling of Sharps and Flats}
+We chose to represent sharps and flats using the \texttt{\#} and \texttt{b} characters, respectively.
+
 \subsubsection{Handling of Octaves}
+The octave for each note is designated by a number (0-8) placed after the letter name. Middle C is represented as C4, and all other notes are offset from that (i.e., the B below middle C is B3, whereas the B above middle C is B4).
+
+If a conductor decided he/she wanted to play "Hot Cross Buns" using A\# instead of A and up one octave from middle C, the song would be represented as follows:
+
+\begin{verbatim}
+hot cross buns
+60
+B5:1--1----1---
+A#5:-1----22-1--
+G5:--hh22----hh
+\end{verbatim}
 
 \subsection{Audio Generation}
 
-\subsubsection{PyAudio}
-\subsubsection{winsound}
-\subsubsection{Linux System Calls}
+% TODO write this. Discuss PyAudio and maybe our other backup plans?
+
+%\subsubsection{PyAudio}
+%\subsubsection{winsound}
+%\subsubsection{Linux System Calls}
 
 \subsection{Design Diagram}
 
-\subsection{Reflection}
-\subsubsection{Best Decision}
-\subsubsection{Room for Improvement}
+% TODO need better diagrams
 
 
 % Analysis of Outcome
-\section{Analysis of Outcome}
+\section{Analysis and Reflection}
+
+\subsection{Deliverable Status}
+% TODO status of deliverable
+
+\subsection{Best Decision}
+% TODO what was the best decision?
+
+\subsection{Worst Decision}
+% TODO what would we change?
 
 
 % Abstractions and Language
 \section{Abstractions and Language}
+We have four major abstractions:
 
-\subsection{Musicians}
-        
-\subsection{Conductors}
+\begin{itemize}
+\item The "conductor," or the server with which the musicians communicate.
+\item The "musician," or a client which is given a note to play.
+\item The parser, which takes a text-based representation of a song and converts it into a set of frequencies, each of which has a list of starting times and durations, that the conductor can distribute to musicians.
+\item The audio module, which attempts several different methods of playing sound based on what packages are available on the client machine.
+\end{itemize}
 
-\subsection{Parsed Songs}
+% TODO Extend this?
 
 
 % Implementation Timeline
