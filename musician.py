@@ -21,6 +21,9 @@ class Musician(Protocol):
         if self.state == 'GETNOTE':
             print 'here'
             loaded_data = json.loads(data)
+            if 'error' in loaded_data.keys():
+                print loaded_data['error']
+                self.transport.loseConnection()
             if 'note' in loaded_data.keys():
                 self.note = loaded_data['note']
                 print 'GOT A NOTE: {}'.format(self.note['frequency'])
@@ -49,8 +52,8 @@ class Musician(Protocol):
         a = audio.Audio()
         for action in self.note['actions']:
             reactor.callLater(action['start_time'], a.play,
-                              self.note['frequency'], action['duration'])     
-            
+                              self.note['frequency'], action['duration'])
+
 
 class MusicianFactory(ClientFactory):
     def startedConnecting(self, connector):

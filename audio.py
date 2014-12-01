@@ -35,8 +35,10 @@ class Audio():
                 #                 rate=bit_rate,
                 #                 output=True)
                 number_of_frames = int(bit_rate * duration)
-                # rest_frames = number_of_frames % bit_rate
+                rest_frames = number_of_frames % bit_rate
+                print "REST FRAMES: {}".format(rest_frames)
                 wavedata = ''
+                print "WAVEDATA:\n {}".format(wavedata)
                 for x in xrange(number_of_frames):
                     wavedata += chr(int(math.sin(x/((bit_rate/freq)/math.pi))*127+128))
 

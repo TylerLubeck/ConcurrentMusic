@@ -30,6 +30,8 @@ class Conductor(Protocol):
             #     self.transport.write(json.dumps({'error': 'Name in use'}))
             #     return
             self.hostname = hostname
+            if len(self.song['song_notes']) == 0:
+                self.transport.write(json.dumps({'error': "We don't need you"}))
             note = self.song['song_notes'].pop(0)
             self.users[self.hostname] = {'user': self,
                                          'note': note}
