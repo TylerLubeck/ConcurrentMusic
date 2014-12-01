@@ -12,7 +12,8 @@ def parse(song):
          'bpm': int,
          'song_notes': [{'frequency': float,
                          'actions': [{'duration': float,
-                                      'start_time': float}]}]}
+                                      'start_time': float}]}],
+         'num_notes': int}
 
     The duration of an action is in seconds, and the start_time is in seconds
     from the beginning of the song.
@@ -22,7 +23,8 @@ def parse(song):
     bpm = int(f.readline().strip('\n'))
     parsed_song = {'title': title,
                    'bpm': bpm,
-                   'song_notes': []}
+                   'song_notes': [],
+                   'num_notes': 0}
     mutex = threading.Lock()
     threads = [threading.Thread(target=parse_line,
                                 args=(line, bpm, parsed_song['song_notes'],
@@ -33,6 +35,7 @@ def parse(song):
     for thread in threads:
         thread.join()
     f.close()
+    parsed_song['num_notes'] = len(parsed_song['song_notes'])
     return parsed_song
 
 
@@ -45,7 +48,7 @@ def parse_line(line, bpm, note_list, mutex):
         return
     # part of line before colon has letter; need to get frequency
     try:
-        note['frequency'] = note_to_freq.get_freq(line_parts[0])
+        note['frequency'] = note_to_freq.get_freq(line_parts[0].strip())
     except note_to_freq.NoSuchNoteError as e:
         sys.stderr.write('%s\n' % e)
         return
@@ -95,6 +98,7 @@ def main():
         for action in note['actions']:
             print ('\t\tstart time: %.1f\tduration: %.1f' %
                    (action['start_time'], action['duration']))
+    print 'number of clients needed: %d' % parsed_song['num_notes']
 
 
 if __name__ == '__main__':
