@@ -59,7 +59,8 @@ class Conductor(Protocol):
 
     def sendTime(self):
         for k, v in self.users.iteritems():
-            k['user'].transport.write('start')
+            print k, v
+            v['user'].transport.write('start')
 
         # map(lambda n: self.transport.write('start'), self.names)
         # for hostname in self.users:
