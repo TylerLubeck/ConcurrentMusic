@@ -1,6 +1,8 @@
 # Audio.py
 # defines play
 import threading
+import os
+from suppress_errors import noalsaerr
 
 
 class Audio():
@@ -21,11 +23,12 @@ class Audio():
         try:
             # use pyaudio for osx
             import pyaudio
-            p = pyaudio.PyAudio()
-            stream = p.open(format=p.get_format_from_width(1),
-                            channels=1,
-                            rate=bit_rate,
-                            output=True)
+            with noalsaerr():
+                p = pyaudio.PyAudio()
+                stream = p.open(format=p.get_format_from_width(1),
+                                channels=1,
+                                rate=bit_rate,
+                                output=True)
 
             def real_play(freq, duration):
                 # p = pyaudio.PyAudio()
@@ -34,22 +37,24 @@ class Audio():
                 #                 channels=1,
                 #                 rate=bit_rate,
                 #                 output=True)
+                os.system('clear')
+                rows, columns = os.popen('stty size', 'r').read().split()
+                rows = int(rows)
+                columns = int(columns)
+                for _ in xrange(rows/4): print '\n'
+                print "{}".format(freq).center(columns)
                 number_of_frames = int(bit_rate * duration)
                 rest_frames = number_of_frames % bit_rate
-                print "REST FRAMES: {}".format(rest_frames)
                 wavedata = ''
-                print "WAVEDATA:\n {}".format(wavedata)
                 for x in xrange(number_of_frames):
                     wavedata += chr(int(math.sin(x/((bit_rate/freq)/math.pi))*127+128))
 
                 # for x in xrange(rest_frames):
                 #     wavedata += chr(128)
 
-                stream.write(wavedata)
+                with noalsaerr():
+                    stream.write(wavedata)
             return real_play
-            stream.stop_stream()
-            stream.close()
-            p.terminate()
 
         except ImportError, e1:
             try:
@@ -58,7 +63,7 @@ class Audio():
 
                 def real_play(freq, duration):
                     raise e1
-                    winsound.Beep(freq, duration)
+                winsound.Beep(freq, duration)
 
                 return real_play
 
