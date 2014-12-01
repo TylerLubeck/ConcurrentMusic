@@ -4,6 +4,7 @@ import socket
 
 from twisted.internet import reactor
 from twisted.internet.protocol import Protocol, ClientFactory
+from datetime import datetime, timedelta
 
 import audio
 import note_to_freq
@@ -11,15 +12,35 @@ import parse
 
 
 class Musician(Protocol):
+    def __init__(self):
+        self.state = 'GETNOTE'
+        self.time = datetime.now()
+        self.note = None
+
     def dataReceived(self, data):
-        loaded_data = json.loads(data)
-        if 'note' in loaded_data.keys():
-            self.note = loaded_data['note']
-            print 'GOT A NOTE: {}'.format(self.note['frequency'])
+        if self.state == 'GETNOTE':
+            print 'here'
+            loaded_data = json.loads(data)
+            if 'note' in loaded_data.keys():
+                self.note = loaded_data['note']
+                print 'GOT A NOTE: {}'.format(self.note['frequency'])
+                self.state = 'READY'
+                self.transport.write('ready')
+            # if 'time' in loaded_data.keys():
+            #     now = datetime.now()
+            #     self.start_time = datetime(loaded_data['time'])
+            #     print self.start_time
+            #     delay = (self.start_time - now).total_seconds()
+            #     print delay
+            #     reactor.callLater(delay, self.play_notes)
+            # print "not here :("
+        #    self.play_notes()
+        elif data == 'start':
+            print 'Here'
             self.play_notes()
-        else:
-            # unhandled message
-            print loaded_data
+        # else:
+        #     # unhandled message
+        #     print loaded_data
 
     def connectionMade(self):
         self.transport.write(json.dumps({'hostname': socket.gethostname()}))
