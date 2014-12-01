@@ -3,8 +3,9 @@ import json
 
 from twisted.internet.protocol import Factory, Protocol
 from twisted.internet import reactor
-from datetime import datetime, timedelta
-import time
+from datetime import datetime
+# from datetime import timedelta
+# import time
 
 import parse
 
@@ -34,33 +35,34 @@ class Conductor(Protocol):
                                          'note': note}
             self.state = 'SENDLETTERS'
             self.names.append(self.hostname)
-            
+
             self.transport.write(json.dumps({'note': note}))
 
         if data == 'ready':
             if not self.song['song_notes']:
                 self.sendTime()
-        #self.transport.write(json.dumps({'time': str(self.time + timedelta(0,10))}))
-        #print self.state
+        # self.transport.write(json.dumps({'time': str(self.time + timedelta(0,10))}))
+        # print self.state
         print self.users
-        #print self.song['song_notes']
+        # print self.song['song_notes']
 
-        #all notes have been given out
-        # if not self.song['song_notes']:
-        #     for hostname in self.users:
-        #         print self.users[hostname]
-        #         # if self.users[hostname].state == 'START':
-        #         #     print 'ready'
-        #     self.sendTime()
-        #     print "Gonna try to play"
-            
+        # all notes have been given out
+        #  if not self.song['song_notes']:
+        #      for hostname in self.users:
+        #          print self.users[hostname]
+        #          # if self.users[hostname].state == 'START':
+        #          #     print 'ready'
+        #      self.sendTime()
+        #      print "Gonna try to play"
+
     def sendTime(self):
+        for k, v in self.users.iteritems():
+            k['user'].transport.write('start')
 
-        map(self.transport.write('start'), self.names)
+        # map(lambda n: self.transport.write('start'), self.names)
         # for hostname in self.users:
         #         Start = True
         #         self.users[hostname]['user'].transport.write(json.dumps({'start': Start}))
-
 
     def connectionLost(self, reason):
         if self.hostname is not None and self.hostname in self.users:
@@ -87,7 +89,7 @@ def main():
     arg_parser.add_argument('--song', '-s', dest='song',
                             help='The file containing the song to play')
     args = arg_parser.parse_args()
-    
+
     parsed_song = parse.parse(args.song)
 
     print("Listening on port {}...".format(args.port))
