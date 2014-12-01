@@ -10,6 +10,13 @@ class Audio():
     def __init__(self):
         self.play_func = self.get_play()
         self.mutex = threading.Lock()
+        self.lines = []
+        with open('note.txt', 'r') as f:
+            self.lines = [line.strip('\n') for line in f.readlines()]
+
+    def print_lines(self):
+        for line in self.lines:
+            print(line)
 
     def play(self, freq, duration):
         self.mutex.acquire()
@@ -41,8 +48,9 @@ class Audio():
                 rows, columns = os.popen('stty size', 'r').read().split()
                 rows = int(rows)
                 columns = int(columns)
-                for _ in xrange(rows/4): print '\n'
-                print "{}".format(freq).center(columns)
+                # for _ in xrange(rows/4): print '\n'
+                # print "{}".format(freq).center(columns)
+                self.print_lines()
                 number_of_frames = int(bit_rate * duration)
                 rest_frames = number_of_frames % bit_rate
                 wavedata = ''

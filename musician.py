@@ -11,6 +11,7 @@ import note_to_freq
 import parse
 
 
+
 class Musician(Protocol):
     def __init__(self):
         self.state = 'GETNOTE'
@@ -19,31 +20,14 @@ class Musician(Protocol):
 
     def dataReceived(self, data):
         if self.state == 'GETNOTE':
-            print 'here'
             loaded_data = json.loads(data)
-            if 'error' in loaded_data.keys():
-                print loaded_data['error']
-                self.transport.loseConnection()
             if 'note' in loaded_data.keys():
                 self.note = loaded_data['note']
                 print 'GOT A NOTE: {}'.format(self.note['frequency'])
                 self.state = 'READY'
                 self.transport.write('ready')
-            # if 'time' in loaded_data.keys():
-            #     now = datetime.now()
-            #     self.start_time = datetime(loaded_data['time'])
-            #     print self.start_time
-            #     delay = (self.start_time - now).total_seconds()
-            #     print delay
-            #     reactor.callLater(delay, self.play_notes)
-            # print "not here :("
-        #    self.play_notes()
         elif data == 'start':
-            print 'Here'
             self.play_notes()
-        # else:
-        #     # unhandled message
-        #     print loaded_data
 
     def connectionMade(self):
         self.transport.write(json.dumps({'hostname': socket.gethostname()}))
@@ -52,8 +36,8 @@ class Musician(Protocol):
         a = audio.Audio()
         for action in self.note['actions']:
             reactor.callLater(action['start_time'], a.play,
-                              self.note['frequency'], action['duration'])
-
+                              self.note['frequency'], action['duration'])     
+            
 
 class MusicianFactory(ClientFactory):
     def startedConnecting(self, connector):

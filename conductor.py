@@ -3,9 +3,6 @@ import json
 
 from twisted.internet.protocol import Factory, Protocol
 from twisted.internet import reactor
-from datetime import datetime
-# from datetime import timedelta
-# import time
 
 import parse
 
@@ -16,7 +13,6 @@ class Conductor(Protocol):
         self.state = "GETNAME"
         self.song = song
         self.hostname = None
-        self.time = datetime.now()
         self.names = []
 
     def connectionMade(self):
@@ -26,9 +22,6 @@ class Conductor(Protocol):
 
         if self.state == 'GETNAME':
             hostname = json.loads(data)['hostname']
-            # if hostname in self.users:
-            #     self.transport.write(json.dumps({'error': 'Name in use'}))
-            #     return
             self.hostname = hostname
             if len(self.song['song_notes']) == 0:
                 self.transport.write(json.dumps({'error': "We don't need you"}))
@@ -44,29 +37,11 @@ class Conductor(Protocol):
         if data == 'ready':
             if not self.song['song_notes']:
                 self.sendTime()
-        # self.transport.write(json.dumps({'time': str(self.time + timedelta(0,10))}))
-        # print self.state
-        print self.users
-        # print self.song['song_notes']
-
-        # all notes have been given out
-        #  if not self.song['song_notes']:
-        #      for hostname in self.users:
-        #          print self.users[hostname]
-        #          # if self.users[hostname].state == 'START':
-        #          #     print 'ready'
-        #      self.sendTime()
-        #      print "Gonna try to play"
 
     def sendTime(self):
         for k, v in self.users.iteritems():
             print k, v
             v['user'].transport.write('start')
-
-        # map(lambda n: self.transport.write('start'), self.names)
-        # for hostname in self.users:
-        #         Start = True
-        #         self.users[hostname]['user'].transport.write(json.dumps({'start': Start}))
 
     def connectionLost(self, reason):
         if self.hostname is not None and self.hostname in self.users:
