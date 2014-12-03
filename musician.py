@@ -37,8 +37,8 @@ class Musician(Protocol):
         a = audio.Audio()
         for action in self.note['actions']:
             reactor.callLater(action['start_time'], a.play,
-                              self.note['frequency'], action['duration'])     
-            
+                              self.note['frequency'], action['duration'])
+
 
 class MusicianFactory(ClientFactory):
     def __init__(self, *args, **kwargs):

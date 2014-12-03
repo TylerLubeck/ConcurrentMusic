@@ -3,6 +3,7 @@
 import threading
 import os
 from suppress_errors import noalsaerr
+from twisted.internet import reactor
 
 
 class Audio():
@@ -23,6 +24,10 @@ class Audio():
         self.play_func(freq, duration)
         self.mutex.release()
 
+    def clean_screen(self):
+        print('\033[40m')
+        os.system('clear')
+
     def get_play(self):
         import math
         # amplitude = 0.5
@@ -31,6 +36,8 @@ class Audio():
             # use pyaudio for osx
             import pyaudio
             with noalsaerr():
+                # Suppress ALSA Error messages. We know they exist,
+                # but they're not relevant to the project
                 p = pyaudio.PyAudio()
                 stream = p.open(format=p.get_format_from_width(1),
                                 channels=1,
@@ -45,12 +52,15 @@ class Audio():
                 #                 rate=bit_rate,
                 #                 output=True)
                 os.system('clear')
+                print('\033[44m')
+                os.system('clear')
+                reactor.callLater(duration, self.clean_screen)
                 rows, columns = os.popen('stty size', 'r').read().split()
                 rows = int(rows)
                 columns = int(columns)
                 # for _ in xrange(rows/4): print '\n'
                 # print "{}".format(freq).center(columns)
-                self.print_lines()
+                # self.print_lines()
                 number_of_frames = int(bit_rate * duration)
                 rest_frames = number_of_frames % bit_rate
                 wavedata = ''
