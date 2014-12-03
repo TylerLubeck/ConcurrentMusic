@@ -2,6 +2,7 @@ import argparse
 import json
 import socket
 import time
+import os
 
 from twisted.internet import reactor
 from twisted.internet.protocol import Protocol, ClientFactory
@@ -80,6 +81,11 @@ def parseArgs():
 
 
 if __name__ == '__main__':
+    os.system('clear')
+    print('\033[40m')
+    os.system('clear')
     args = parseArgs()
     reactor.connectTCP(args.ip, args.port, MusicianFactory())
     reactor.run()
+    print('\033[47m')
+    os.system('clear')
