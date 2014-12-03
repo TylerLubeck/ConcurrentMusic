@@ -4,6 +4,7 @@ import threading
 import os
 from suppress_errors import noalsaerr
 from twisted.internet import reactor
+import random
 
 
 class Audio():
@@ -32,6 +33,8 @@ class Audio():
         import math
         # amplitude = 0.5
         bit_rate = 16000
+        colors = ['\033[42m', '\033[44m', '\033[41m']
+        color = random.choice(colors)
         try:
             # use pyaudio for osx
             import pyaudio
@@ -52,7 +55,7 @@ class Audio():
                 #                 rate=bit_rate,
                 #                 output=True)
                 os.system('clear')
-                print('\033[44m')
+                print(color)
                 os.system('clear')
                 reactor.callLater(duration, self.clean_screen)
                 rows, columns = os.popen('stty size', 'r').read().split()
