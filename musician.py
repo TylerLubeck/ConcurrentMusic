@@ -1,6 +1,7 @@
 import argparse
 import json
 import socket
+import time
 
 from twisted.internet import reactor
 from twisted.internet.protocol import Protocol, ClientFactory
@@ -40,18 +41,35 @@ class Musician(Protocol):
             
 
 class MusicianFactory(ClientFactory):
+    def __init__(self, *args, **kwargs):
+        self.attempts = 10
+        # super(MusicianFactory, self).__init__(*args, **kwargs)
+        # super(MusicianFactory, self).__init__()
     def startedConnecting(self, connector):
         print 'Started to connect.'
 
     def buildProtocol(self, addr):
         print 'Connected.'
+        self.attempts = 10
         return Musician()
 
     def clientConnectionLost(self, connector, reason):
-        print 'Lost connection.'
+        self.attempts -= 1
+        if self.attempts > 0:
+            time.sleep(1)
+            connector.connect()
+        else:
+            print 'Lost connection.'
+            reactor.stop()
 
     def clientConnectionFailed(self, connector, reason):
-        print 'Connection failed.'
+        self.attempts -= 1
+        if self.attempts > 0:
+            time.sleep(1)
+            connector.connect()
+        else:
+            print 'Connection failed.'
+            reactor.stop()
 
 
 def parseArgs():
