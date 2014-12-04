@@ -26,6 +26,8 @@ class Conductor(Protocol):
             if len(self.song['song_notes']) == 0:
                 self.transport.write(json.dumps({'error': "We don't need you"}))
                 return
+            else:
+                print("Need {} more".format(len(self.song['song_notes'])))
             note = self.song['song_notes'].pop(0)
             self.users[self.hostname] = {'user': self,
                                          'note': note}
