@@ -62,3 +62,6 @@ target/
 *.toc
 *.out
 *.gz
+
+# Mac OS stuff
+.DS_Store
