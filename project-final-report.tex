@@ -153,6 +153,10 @@ of machines.
 \section{Analysis and Reflection}
 
 \subsection{Deliverable Status}
+Our orchestra can play any song provided in the format described earlier in this report. Any machine
+with PortAudio and PyAudio can join as a musician. The conductor does not need to have these
+packages installed. We also accomplished an extra stretch goal of having the musician's terminal
+light up when it is playing a note.
 
 \subsection{Best Decision}
 % TODO what was the best decision?
@@ -181,9 +185,40 @@ packages are available on the client machine.
 \section{Implementation Strategy}
 
 \subsection{Timeline}
+\begin{itemize}
+\item November 10:
+    \begin{itemize}
+    \item Have a working connection between conductor and musicians
+    \item Handle new musicians and dropped connections
+    \item Generate at least one test file in parsable format
+    \end{itemize}
+\item November 17:
+    \begin{itemize}
+    \item Gain access to Halligan 105 for testing
+    \item Request that packages be installed on Linux machines and Mac lab machines
+    \item Be able to parse input file through the conductor and send sets of notes to musicians
+    \end{itemize}
+\item November 24:
+    \begin{itemize}
+    \item Musicians can play their specified note
+    \item Enforce consistent sense of timing among machines
+    \end{itemize}
+\item December 1:
+    \begin{itemize}
+    \item Have musicians attempt to reconnect to conductor when a connection is lost
+    \item Light up terminal screen when musician is actively playing
+    \end{itemize}
+\item December 5:
+    \begin{itemize}
+    \item Have conductors and musicians exit more gracefully when the song is over
+    \end{itemize}
+\end{itemize}
 
 \subsection{Reflection on Division of Labor}
-
+We originally planned to work on all aspects of this project as a group. However, scheduling issues
+prevented this from happening in several cases. As a result, not all group members were present for
+certain design changes. More clearly defining who was responsible for which portions of the
+implementation may have resulted in a more refined finished product.
 
 % Bug Report
 \section{Bug Report}
