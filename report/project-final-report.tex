@@ -232,18 +232,25 @@ explanation of the program structure follows.
 
 \subsection{Python Modules}
 \begin{description}
-\item[\texttt{audio.py}]
-\item[\texttt{conductor.py}]
-\item[\texttt{musician.py}]
-\item[\texttt{note\_to\_freq.py}]
-\item[\texttt{parse.py}]
-\item[\texttt{suppress\_errors.py}]
+\item[\texttt{audio.py}] Contains an audio class which constructs a function with which to play
+sound, based on packages available on the musician.
+\item[\texttt{conductor.py}] Contains the implementation of the conductor.
+\item[\texttt{musician.py}] Contains the implementation of the musician.
+\item[\texttt{note\_to\_freq.py}] Contains logic to convert from a letter note (such as C4 or A\#5)
+to a frequency. Also contains logic to calculate the duration of a note based on the BPM of the
+song.
+\item[\texttt{parse.py}] Contains logic to concurrently parse a given song file.
+\item[\texttt{suppress\_errors.py}] Contains handlers necessary to avoid printing excessive output
+when PyAudio encounters errors.
 \end{description}
 
 \subsection{Other Files}
 \begin{description}
 \item[\texttt{songs/*}] A collection of songs in the correct format.
-\item[\texttt{}]
+\item[\texttt{note.txt}] An ASCII note that can be displayed when a musician plays.
+\item[\texttt{requirements.txt}] A list of necessary packages that can be installed via
+\href{https://pypi.python.org/pypi/pip}{pip}.
+\end{description}
 
 % How To Run
 \section{How To Run}
