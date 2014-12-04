@@ -145,7 +145,6 @@ of machines.
 
 
 \subsection{Design Diagram}
-
 % TODO need better diagrams
 
 
@@ -166,7 +165,7 @@ light up when it is playing a note.
 
 
 % Abstractions and Language
-\section{Abstractions and Language} We have four major abstractions:
+\section{Abstractions and Language} We have three major abstractions:
 
 \begin{itemize}
 \item The "conductor," or the server with which the musicians communicate.
@@ -174,11 +173,11 @@ light up when it is playing a note.
 \item The parser, which takes a text-based representation of a song and converts it into a set of
 frequencies, each of which has a list of starting times and durations, that the conductor can
 distribute to musicians.
-\item The audio module, which attempts several different methods of playing sound based on what
-packages are available on the client machine.
 \end{itemize}
 
-% TODO Extend this?
+The implementation also contains an audio module. This module could be extended to attempt several
+different methods of playing sound based on what packages are available on the client machine. At
+present, the module either plays sound using PyAudio or does not play sound at all.
 
 
 % Implementation Timeline
@@ -211,6 +210,8 @@ packages are available on the client machine.
 \item December 5:
     \begin{itemize}
     \item Have conductors and musicians exit more gracefully when the song is over
+    \item Allow conductor to be started with a list of songs so that the musicians can play a
+    concert
     \end{itemize}
 \end{itemize}
 
@@ -226,9 +227,26 @@ implementation may have resulted in a more refined finished product.
 
 % Code Overview
 \section{Code Overview}
+Our code is available on \href{https://github.com/TylerLubeck/ConcurrentMusic}{GitHub}. An
+explanation of the program structure follows.
 
+\subsection{Python Modules}
+\begin{description}
+\item[\texttt{audio.py}]
+\item[\texttt{conductor.py}]
+\item[\texttt{musician.py}]
+\item[\texttt{note\_to\_freq.py}]
+\item[\texttt{parse.py}]
+\item[\texttt{suppress\_errors.py}]
+\end{description}
+
+\subsection{Other Files}
+\begin{description}
+\item[\texttt{songs/*}] A collection of songs in the correct format.
+\item[\texttt{}]
 
 % How To Run
 \section{How To Run}
+
 
 \end{document}
