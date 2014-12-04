@@ -1,7 +1,8 @@
+% This file uses a max column with of 100 characters.
+
 \documentclass[12pt, letterpaper]{article}
 
-\usepackage{courier}
-\usepackage[margin=1in]{geometry}
+\usepackage{courier} \usepackage[margin=1in]{geometry}
 \usepackage[colorlinks, linkcolor=black, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
 \usepackage{parskip}
 
@@ -19,26 +20,48 @@
 
 % Project Summary
 \section{Project Goals}
-Our goal for this project was to create a digitally distributed orchestra. Given a representation of a song (i.e. digitized sheet music), one computer would assign various client machines a note to play. The client machines would then play the song together.
+Our goal for this project was to create a digitally distributed orchestra. Given a representation of
+a song (i.e. digitized sheet music), one computer would assign various client machines a note to
+play. The client machines would then play the song together.
 
-At a minimum, we wanted our orchestra to be able to play a hard-coded sequence of frequencies and durations in unison. Any client with \href{http://people.csail.mit.edu/hubert/pyaudio/}{PyAudio} installed could serve as a client in our minimum deliverable.
+At a minimum, we wanted our orchestra to be able to play a hard-coded sequence of frequencies and
+durations in unison. Any client with \href{http://people.csail.mit.edu/hubert/pyaudio/}{PyAudio}
+installed could serve as a client in our minimum deliverable.
 
-One stretch goal was being able to play any song written in a specific format. This would involve handling songs which played notes in multiple octaves as well as those containing sharps and/or flats. Another stretch goal was supporting more types of client machines, such as Windows and Linux machines without the PyAudio package. 
+One stretch goal was being able to play any song written in a specific format. This would involve
+handling songs which played notes in multiple octaves as well as those containing sharps and/or
+flats. Another stretch goal was supporting more types of client machines, such as Windows and Linux
+machines without the PyAudio package. 
 
 % Design Decisions
 \section{Final Design}
 
 \subsection{Client-Server Relationship}
-For this project, we need to implement some notion of clients communicating with a central server. We considered two options for this.
+For this project, we need to implement some notion of clients communicating with a central server.
+We considered two options for this.
             
 \subsubsection{Option 1: Twisted}
-The first was using the \href{https://twistedmatrix.com/}{Twisted} Python package. Given that parsing of the song file and playing the audio must be done in Python, using this option would allow the entire project to be implemented in one language. Twisted has a built-in notion of connections being made and lost, which would allow our server to more easily keep track of clients and distribute song notes accordingly. It also has a notion of executing tasks at specific time deltas, which may help enforce a consistent concept of time among the clients. However, none of us have used this framework before, and it involves some fairly low-level asynchronous calls, which may prove to be a challenge.
+The first was using the \href{https://twistedmatrix.com/}{Twisted} Python package. Given that
+parsing of the song file and playing the audio must be done in Python, using this option would allow
+the entire project to be implemented in one language. Twisted has a built-in notion of connections
+being made and lost, which would allow our server to more easily keep track of clients and
+distribute song notes accordingly. It also has a notion of executing tasks at specific time deltas,
+which would help enforce a consistent concept of time among the clients. However, none of us had
+used this framework before, and it involves some fairly low-level asynchronous calls, which had the
+potential to be challenging.
             
 \subsubsection{Option 2: Erlang}
-The second was implementing the server/client relationship in Erlang and the file/audio parsing in Python. This option would allow us to take advantage of Erlang’s built-in message passing for note distribution. File parsing and sound generation would be more easily accomplished in Python, and we could use the \href{http://erlport.org/docs/python.html}{ErlPort} package to communicate between the two languages. However, we would have to implement the concept of client connections being lost ourselves.
+The second was implementing the server/client relationship in Erlang and the file/audio parsing in
+Python. This option would allow us to take advantage of Erlang’s built-in message passing for note
+distribution. File parsing and sound generation would be more easily accomplished in Python, and we
+could use the \href{http://erlport.org/docs/python.html}{ErlPort} package to communicate between the
+two languages. However, we would have to implement the concept of client connections being lost
+ourselves.
             
 \subsubsection{Decision}
-We opted to use the first method. Being able to redistribute notes when a client drops seems like an important requirement for a digitally distributed orchestra. This functionality is built in to the Twisted servers, whereas we would have to implement it ourselves in the Erlang clients.
+We opted to use the first method. Being able to redistribute notes when a client drops seems like an
+important requirement for a digitally distributed orchestra. This functionality is built in to the
+Twisted servers, whereas we would have to implement it ourselves in the Erlang clients.
 
 \subsection{Sheet Music Representation}
         
@@ -53,10 +76,16 @@ Note 2: --XX---X---
 ...
 \end{verbatim}
             
-Note 1, 2, etc. will be “A”, “B”, and so on. A dash represents a beat where the given note does not play, and an X represents a beat where the given note does play.
+Note 1, 2, etc. will be “A”, “B”, and so on. A dash represents a beat where the given note does not
+play, and an X represents a beat where the given note does play.
             
 \subsubsection{Refinement of Long Note Representation}
-After we began implementing the parser for this format, we realized that this was not the best representation. We modified our song format to include the dash character (\texttt{-}), numbers, and the letter \texttt{h}. A dash represents one beat of silence. Numbers represent the number of times the note plays in one beat. This allows us to represent quarter notes, eighth notes, and so on. The \texttt{h} indicates a hold of the previous note, and allows us to represent notes lasting longer than one beat. "Hot Cross Buns," for example, looked like this in the new format:
+After we began implementing the parser for this format, we realized that this was not the best
+representation. We modified our song format to include the dash character (\texttt{-}), numbers, and
+the letter \texttt{h}. A dash represents one beat of silence. Numbers represent the number of times
+the note plays in one beat. This allows us to represent quarter notes, eighth notes, and so on. The
+\texttt{h} indicates a hold of the previous note, and allows us to represent notes lasting longer
+than one beat. "Hot Cross Buns," for example, looked like this in the new format:
             
 \begin{verbatim}
 hot cross buns
@@ -66,7 +95,11 @@ A:-1----22-1--
 G:--1h22----1h
 \end{verbatim}
 
-We then discovered that handling held notes with this format was cumbersome. If a 1 was found while parsing, it was difficult to discern whether the note played for one beat or was supposed to be held over multiple beats. As a result, we again modified our format so that all beats over which a note was supposed to be held were designated by the \texttt{h} character. This led us to the following representation of "Hot Cross Buns":
+We then discovered that handling held notes with this format was cumbersome. If a 1 was found while
+parsing, it was difficult to discern whether the note played for one beat or was supposed to be held
+over multiple beats. As a result, we again modified our format so that all beats over which a note
+was supposed to be held were designated by the \texttt{h} character. This led us to the following
+representation of "Hot Cross Buns":
 
 \begin{verbatim}
 hot cross buns
@@ -77,28 +110,39 @@ G:--hh22----hh
 \end{verbatim}
             
 \subsubsection{Handling of Sharps and Flats}
-We chose to represent sharps and flats using the \texttt{\#} and \texttt{b} characters, respectively.
+We chose to represent sharps and flats using the \texttt{\#} and \texttt{b} characters,
+respectively.
 
 \subsubsection{Handling of Octaves}
-The octave for each note is designated by a number (0-8) placed after the letter name. Middle C is represented as C4, and all other notes are offset from that (i.e., the B below middle C is B3, whereas the B above middle C is B4).
+The octave for each note is designated by a number (0-8) placed after the letter name. Middle C is
+represented as C4, and all other notes are offset from that (i.e., the B below middle C is B3,
+whereas the B above middle C is B4).
 
-If a conductor decided he/she wanted to play "Hot Cross Buns" using A\# instead of A and up one octave from middle C, the song would be represented as follows:
+If a conductor decided he/she wanted to play "Hot Cross Buns" using A\# instead of A and up one
+octave from middle C, the song would be represented as follows:
 
 \begin{verbatim}
 hot cross buns
 60
-B5:1--1----1---
+ B5:1--1----1---
 A#5:-1----22-1--
-G5:--hh22----hh
+ G5:--hh22----hh
 \end{verbatim}
 
+Note that whitespace is allowed in note names to allow for beat alignment in the song files.
+
 \subsection{Audio Generation}
+We chose to use the PyAudio package for this task. PyAudio provides Python bindings for
+\href{http://www.portaudio.com/}{PortAudio}, a cross-platform audio I/O library. Using this package
+allowed our orchestra to support any computer architecture without implementing
+architecture-specific logic ourselves.
 
-% TODO write this. Discuss PyAudio and maybe our other backup plans?
+We also considered using system calls on Linux machines and the
+\href{https://docs.python.org/2/library/winsound.html}{winsound} module on Windows machines as
+fallbacks if PyAudio was not installed. However, because the EECS staff installed PyAudio on all of
+the Halligan lab machines for us, this was not necessary to test our orchestra with a large number
+of machines.
 
-%\subsubsection{PyAudio}
-%\subsubsection{winsound}
-%\subsubsection{Linux System Calls}
 
 \subsection{Design Diagram}
 
@@ -109,7 +153,6 @@ G5:--hh22----hh
 \section{Analysis and Reflection}
 
 \subsection{Deliverable Status}
-% TODO status of deliverable
 
 \subsection{Best Decision}
 % TODO what was the best decision?
@@ -119,14 +162,16 @@ G5:--hh22----hh
 
 
 % Abstractions and Language
-\section{Abstractions and Language}
-We have four major abstractions:
+\section{Abstractions and Language} We have four major abstractions:
 
 \begin{itemize}
 \item The "conductor," or the server with which the musicians communicate.
 \item The "musician," or a client which is given a note to play.
-\item The parser, which takes a text-based representation of a song and converts it into a set of frequencies, each of which has a list of starting times and durations, that the conductor can distribute to musicians.
-\item The audio module, which attempts several different methods of playing sound based on what packages are available on the client machine.
+\item The parser, which takes a text-based representation of a song and converts it into a set of
+frequencies, each of which has a list of starting times and durations, that the conductor can
+distribute to musicians.
+\item The audio module, which attempts several different methods of playing sound based on what
+packages are available on the client machine.
 \end{itemize}
 
 % TODO Extend this?
