@@ -2,7 +2,9 @@
 
 \documentclass[12pt, letterpaper]{article}
 
-\usepackage{courier} \usepackage[margin=1in]{geometry}
+\usepackage{courier}
+\usepackage{enumitem}
+\usepackage[margin=1in]{geometry}
 \usepackage[colorlinks, linkcolor=black, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
 \usepackage{parskip}
 
@@ -145,7 +147,7 @@ of machines.
 
 
 \subsection{Design Diagram}
-% TODO need better diagrams
+% TODO
 
 
 % Analysis of Outcome
@@ -158,10 +160,10 @@ packages installed. We also accomplished an extra stretch goal of having the mus
 light up when it is playing a note.
 
 \subsection{Best Decision}
-% TODO what was the best decision?
+% TODO
 
 \subsection{Worst Decision}
-% TODO what would we change?
+% TODO
 
 
 % Abstractions and Language
@@ -184,35 +186,38 @@ present, the module either plays sound using PyAudio or does not play sound at a
 \section{Implementation Strategy}
 
 \subsection{Timeline}
-\begin{itemize}
+\begin{itemize}[parsep=0pt]
 \item November 10:
     \begin{itemize}
-    \item Have a working connection between conductor and musicians
-    \item Handle new musicians and dropped connections
-    \item Generate at least one test file in parsable format
+    \item Had a working connection between conductor and musicians
+    \item Handled new musicians and dropped connections
+    \item Generated test files in parsable format
+    \item Parsed input file through the conductor and sent sets of notes to musicians
     \end{itemize}
 \item November 17:
     \begin{itemize}
-    \item Gain access to Halligan 105 for testing
-    \item Request that packages be installed on Linux machines and Mac lab machines
-    \item Be able to parse input file through the conductor and send sets of notes to musicians
+    \item Gained access to Halligan 105 for testing
+    \item Requested that packages be installed on Linux machines and Mac lab machines
+    \item Began writing PyAudio-based play function
     \end{itemize}
 \item November 24:
     \begin{itemize}
-    \item Musicians can play their specified note
-    \item Enforce consistent sense of timing among machines
+    \item Abandoned attempts to prevent the sound card of clicking
+    \item Musicians could play their specified note
     \end{itemize}
 \item December 1:
     \begin{itemize}
-    \item Have musicians attempt to reconnect to conductor when a connection is lost
-    \item Light up terminal screen when musician is actively playing
+    \item Enforced consistent sense of timing among machines
+    \item Had musicians attempt to reconnect to conductor when a connection is lost
+    \item Lit up terminal screen when musician is actively playing
     \end{itemize}
-\item December 5:
-    \begin{itemize}
-    \item Have conductors and musicians exit more gracefully when the song is over
-    \item Allow conductor to be started with a list of songs so that the musicians can play a
-    concert
-    \end{itemize}
+% TODO re-add if we finish these things
+%\item December 5:
+%    \begin{itemize}
+%    \item Had conductors and musicians exit more gracefully when the song is over
+%    \item Allowed conductor to be started with a list of songs so that the musicians can play a
+%    concert
+%    \end{itemize}
 \end{itemize}
 
 \subsection{Reflection on Division of Labor}
@@ -223,7 +228,7 @@ implementation may have resulted in a more refined finished product.
 
 % Bug Report
 \section{Bug Report}
-
+% TODO
 
 % Code Overview
 \section{Code Overview}
@@ -252,8 +257,8 @@ when PyAudio encounters errors.
 \href{https://pypi.python.org/pypi/pip}{pip}.
 \end{description}
 
-% How To Run
-\section{How To Run}
+\subsection{How To Run}
+% TODO
 
 
 \end{document}
