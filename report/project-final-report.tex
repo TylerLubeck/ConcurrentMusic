@@ -160,19 +160,19 @@ packages installed. We also accomplished an extra stretch goal of having the mus
 light up when it is playing a note.
 
 \subsection{Best Decision}
-There were many design decisions that shaped our project but the best decision we made was to create
-a seperate parse module. Having the conductor call the module with the given song allows us to parse
-the song however we choose. This modularity gives us the flexibility to change the song format in the
-future allowing us to acomplish our stertch goals of playing sharps and flats as well as notes in
-multiple octaves, without redesigning our entire project.
+There were many design decisions that shaped our project, but the best decision we made was to
+create a separate parsing module. Having the conductor call the module with the given song allows
+us to parse the song however we choose. This modularity gives us the flexibility to change the
+song format in the future, and it allowed us to accomplish our stretch goals of playing sharps and
+flats as well as notes in multiple octaves without redesigning our entire project.
 
 \subsection{Worst Decision}
-The worst decision we made was to reconnect the sound card every time a note was played. Connecting 
-and disconnecting the sound card caused a horrid clicking noise, ruining the fluidity of the song. 
-Changing this however, would require a redesign of our system and could potentially make the 
-program less concurrent. This may have also been caused by our decision to play a sign wave which
-stopped abruptly after the specified duration ended, instead of gradually getting softer, much like
-any instrument would when played.
+The worst decision we made was to connect to the sound card every time a note was played.
+Connecting to and disconnecting from the sound card causes a horrid clicking noise, ruining the
+fluidity of the song. Changing this, however, would require a significant redesign of our musician.
+This may have been caused by our decision to use PyAudio to play a sine wave, which stopped abruptly
+after the specified duration ended. It does not resemble musical instruments, which gradually get
+softer as the note finishes.
 
 
 % Abstractions and Language

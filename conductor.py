@@ -8,10 +8,10 @@ import parse
 
 
 class Conductor(Protocol):
-    def __init__(self, users, song):
+    def __init__(self, users, songs):
         self.users = users
         self.state = "GETNAME"
-        self.song = song
+        self.songs = songs
         self.hostname = None
         self.names = []
 
@@ -19,8 +19,9 @@ class Conductor(Protocol):
         print("GOT A CONNECTION")
 
     def dataReceived(self, data):
-
+        """Handles messages received from musicians."""
         if self.state == 'GETNAME':
+            # A new musician has connected
             hostname = json.loads(data)['hostname']
             self.hostname = hostname
             if len(self.song['song_notes']) == 0:
@@ -40,6 +41,9 @@ class Conductor(Protocol):
             if not self.song['song_notes']:
                 self.sendTime()
 
+        if data == 'finished':
+
+
     def sendTime(self):
         for k, v in self.users.iteritems():
             print k, v
@@ -54,27 +58,34 @@ class Conductor(Protocol):
 
 class ConductorFactory(Factory):
 
-    def __init__(self, song):
+    def __init__(self, songs):
         self.users = {}     # maps user names to Musician instances
-        self.song = song    # object returned by parser
+        self.songs = songs  # objects returned by parser
 
     def buildProtocol(self, addr):
-        return Conductor(self.users, self.song)
+        return Conductor(self.users, self.songs)
 
 
-def main():
+def parse_arguments():
     desc = 'Launch the conductor for the distributed music client/server system'
     arg_parser = argparse.ArgumentParser(description=desc)
     arg_parser.add_argument('--port', '-p', dest='port', type=int,
                             default=8123, help='The port to listen on')
-    arg_parser.add_argument('--song', '-s', dest='song',
-                            help='The file containing the song to play')
-    args = arg_parser.parse_args()
+    arg_parser.add_argument('--song', '-s', dest='song', nargs='+',
+                            help='The file(s) containing the song to play')
+    return arg_parser.parse_args()
 
-    parsed_song = parse.parse(args.song)
+
+def main():
+    args = parse_arguments()
+    parsed_songs = []
+   
+    # This could be made concurrent in the future.
+    for song in args.song:
+        parsed_song = parse.parse(song)
 
     print("Listening on port {}...".format(args.port))
-    reactor.listenTCP(args.port, ConductorFactory(parsed_song))
+    reactor.listenTCP(args.port, ConductorFactory(parsed_songs))
     reactor.run()
 
 
