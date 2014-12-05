@@ -241,7 +241,14 @@ implementation may have resulted in a more refined finished product.
 
 % Bug Report
 \section{Bug Report}
-% TODO
+At one point, we encountered race conditions regarding accessing the sound card. If a musician was
+instructed to play two notes back-to-back, the first note would often still be playing when it came
+time for the second note to play. As a result, the second note could not access the sound card, and
+it would never be played.
+
+We solved this problem by setting the duration of each note to 90\% of its true value. The notes
+sounded correct to a human listener, and there was enough space in between sound card accesses that
+all notes played correctly.
 
 % Code Overview
 \section{Code Overview}
