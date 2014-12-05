@@ -258,7 +258,18 @@ when PyAudio encounters errors.
 \end{description}
 
 \subsection{How To Run}
-% TODO
-
+\begin{enumerate}
+\item Install \href{http://www.portaudio.com/}{PortAudio} for your machine's architecture.
+\item Install \href{http://people.csail.mit.edu/hubert/pyaudio/}{PyAudio}.
+\item Clone the code from \href{https://github.com/TylerLubeck/ConcurrentMusic}{GitHub}.
+\item Install other Python packages:\\
+\texttt{pip install -r ConcurrentMusic/requirements.txt}
+\item To start a conductor:\\
+\texttt{python conductor.py --song <path to song> --port <port>}\\
+The port number is optional and defaults to 8123.
+\item To start a musician:\\
+\texttt{python musician.py --ip <IP of conductor> --port <port of conductor>}\\
+The port number is again optional and also defaults to 8123.
+\end{enumerate}
 
 \end{document}
