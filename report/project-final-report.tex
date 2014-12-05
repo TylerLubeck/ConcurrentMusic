@@ -5,8 +5,12 @@
 \usepackage{courier}
 \usepackage{enumitem}
 \usepackage[margin=1in]{geometry}
+\usepackage{graphicx}
 \usepackage[colorlinks, linkcolor=black, urlcolor=blue, pdfborder={0 0 0}]{hyperref}
 \usepackage{parskip}
+
+% Use current working directory as image path
+\graphicspath{{/}}
 
 \begin{document}
 
@@ -147,7 +151,9 @@ of machines.
 
 
 \subsection{Design Diagram}
-% TODO
+\begin{figure}
+\includegraphics[width=\textwidth]{old_diagram}
+\end{figure}
 
 
 % Analysis of Outcome
